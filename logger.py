@@ -6,7 +6,7 @@ layout = [[sg.Text('NSARA Contest Logger')],
         [sg.Text('Call:'), sg.Input(key = '-Call-'), sg.Text('Time:'), sg.Input(key = '-Time-')],
         [sg.Text('RST:'), sg.Input(key = '-RST-'), sg.Text('Mode:'), sg.Input(key = '-Mode-')],
         [sg.Text('County or Serial:'), sg.Input(key = '-County-')],
-        [sg.Button('Save', size = (15,1)), sg.Button('Cancel', size = (15,1))]]  
+        [sg.Button('Save', size = (15,1)), sg.Button('Clear', size = (15,1))]]  
 
 window = sg.Window('Logger', layout) 
 
