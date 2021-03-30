@@ -8,4 +8,6 @@ March 25, 2021
 * [ ] Do dropdown for County listing all NS counties but allow other input as well
 * [ ] Check for dupes
 * [ ] Show stats: # of QSO's + # of counties = score
- 
+* [ ] Put fields into columns
+* [ ] Put a frame around the input section
+* [ ] Maybe display some number of recent entries below the input form and buttons
