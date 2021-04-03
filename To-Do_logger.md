@@ -14,4 +14,5 @@ March 25, 2021
 * [ ] Maybe select a previously saved entry and allow changes?
 * [x] countiesWorked list should ignore serial numbers
 * [ ] Make a Clean Sweep popup for all 18 counties
-* [ ] Save and restore scores between sessionsS
+* [ ] Save and restore scores between sessions
+* [ ] Add columns to layout to center things
