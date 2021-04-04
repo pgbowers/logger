@@ -6,7 +6,7 @@ March 25, 2021
 * [x] RST should default to 59 but be changeable
 * [x] Do dropdown for Mode: Phone, CW, Digital
 * [x] Do dropdown for County listing all NS counties but allow other input as well
-* [ ] Check for dupes
+* [ ] Check for dupes unless mode is different
 * [x] Show stats: # of QSO's + # of counties = score
 * [ ] Put fields into columns
 * [ ] Put a frame around the input section
