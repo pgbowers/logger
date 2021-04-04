@@ -78,7 +78,9 @@ while True:
             #**************
         # Check for duplicate call signs
         elif values['-Call-'] in callList:
-            sg.popup("That's a Dupe!", title = 'OOPS!')
+            dupeChoice = sg.popup_yes_no("Possible Dupe depending on Mode!\n Continue - Yes, No - Clear", title = 'Possible Duplicate Callsign')
+            if dupeChoice == 'No':
+                clearInput()
         # Check for empty input
         elif values['-Call-']=='': 
             sg.popup('Callsign cannot be blank.', title = 'OOPS!') 
