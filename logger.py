@@ -30,14 +30,13 @@ score = 0
 #callDict = {}
 callList = []
 
-layout = [[sg.T('NSARA Contest Logger', size = (20,2))],
-        [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = False, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
+layout =  [[sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = False, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
-        [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), pad = (80, 0)), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the program', size = (15, 1), pad = (80, 1))]],title = "Input")],
-        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score')],
-        [sg.Frame(layout = [[sg.Multiline(default_text='Hello list!!', background_color = 'white')]], title = 'Your Log')]] 
+        [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the program', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
+        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20)))],
+        [sg.Frame(layout = [[sg.Multiline(default_text='Hello list!!', background_color = 'white')]], title = 'Your Log', pad = ((20, 20),(0, 20)))]] 
           
-window = sg.Window('Logger', layout, element_justification = 'c', grab_anywhere = True) 
+window = sg.Window('NSARA Contest Logger', layout, element_justification = 'l', grab_anywhere = True, resizable = True) 
 
 while True:
     event, values = window.read() 
