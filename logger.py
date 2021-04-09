@@ -18,6 +18,16 @@ def clearInput():
         window['-Mode-']('Phone')
         window['-County-']('')
 
+def clearScores():
+    # clear the scoring fields and the scores.csv file
+    print('Clear scores')
+    QSOCount = 0
+    window.Element('-QSO-').update(QSOCount)
+    
+    # erase the contents of the scores file
+    with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/scores.csv", "w") as scores:
+        scores.truncate(0)
+
 counties = ['Annapolis', 'Antigonish', 'Cape Breton', 'Colchester', 'Cumberland', 
             'Digby', 'Guysborough','Halifax', 'Hants', 'Inverness', 'Kings', 'Lunenburg', 
             'Pictou', 'Queens', 'Richmond', 'Shelburne', 'Victoria', 'Yarmouth']
@@ -31,7 +41,7 @@ score = 0
 callList = []
 
 # ------ Menu Definition ------ #
-menu_def = [['&File', ['&Open     Ctrl-O', '&Save       Ctrl-S', '&Properties', 'E&xit']],
+menu_def = [['&File', ['&Open     Ctrl-O', '&Save       Ctrl-S', '&Clear Scores', 'E&xit']],
             ['&Edit', ['&Paste', ['Special', 'Normal', ], 'Undo'], ],
             ['&Toolbar', ['---', 'Command &1', 'Command &2',
                         '---', 'Command &3', 'Command &4']],
@@ -41,18 +51,18 @@ layout =[
         [sg.Menu(menu_def, tearoff=False, pad=(200, 1))],
         [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = False, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
-        [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the program', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
+        [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
         [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20)))],
         [sg.Frame(layout = [[sg.Multiline(default_text='Hello list!!', background_color = 'white')]], title = 'Your Log', pad = ((20, 20),(0, 20)))]] 
           
-window = sg.Window('NSARA Contest Logger', layout, element_justification = 'l', grab_anywhere = True, resizable = True) 
+window = sg.Window('NSARA Contest Logger', layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
 
 while True:
-    event, values = window.read() 
+    event, values = window.read()                                                                                               
   
     if event == 'Exit' or event == sg.WIN_CLOSED:
         # Write the scores to a local file for next session      
-        with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/scores.csv", "a") as scores:
+        with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/scores.csv", "w") as scores:
             scores.write(str(QSOCount) + ',')
             scores.write(str(len(countiesWorked)) + ',')
             scores.write(str(score) + '\n')
@@ -60,6 +70,19 @@ while True:
         break
     if event == 'Clear':
         clearInput()
+
+    if event == 'About...':
+            #window.disappear() # uses alpha channel so doesn't work on Elementary or PI
+            sg.popup('NSARA Contest Logger', 'Version 1.0',
+            'by Peter Bowers, VE1BZI', no_titlebar = True, grab_anywhere=False)
+            #window.reappear() # uses alpha channel so doesn't work on Elementary or PI
+
+    if event == 'Open':
+            filename = sg.popup_get_file('file to open', no_window=True)
+            print('Open clicked')
+
+    if event == 'Clear Scores':
+            clearScores()
 
     if event == 'Save':
         if values['-Call-'] != '' and values['-County-'] != '': 
