@@ -3,6 +3,12 @@ from datetime import datetime
 
 sg.theme('Kayak')
 
+# Declare some variables
+countiesWorked = []
+QSOCount = 0
+score = 0
+countyScore = 0
+
 # Get the current system time for the log
 now = datetime.now()
 current_time = now.strftime("%H:%M")
@@ -20,22 +26,31 @@ def clearInput():
 
 def clearScores():
     # clear the scoring fields and the scores.csv file
-    print('Clear scores')
-    QSOCount = 0
-    window.Element('-QSO-').update(QSOCount)
-    
-    # erase the contents of the scores file
-    with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/scores.csv", "w") as scores:
-        scores.truncate(0)
+
+    # send a popup first to make sure...
+    confirmClear = sg.popup_yes_no('Are you sure?', title = 'Confirm clear scores')    
+    if confirmClear == 'No':
+        pass
+    else:        
+        # the global keyword is needed to change QSOCount in this function and have the change apply everywhere.
+        global QSOCount, score, countiesWorked, countyScore
+        QSOCount = 0
+        score = 0
+        countyScore = 0
+        countiesWorked = []       
+        window.Element('-QSO-').update(QSOCount)
+        window.Element('-Counties-').update(countyScore)
+        window.Element('-Score-').update(score)    
+        # erase the contents of the scores file
+        with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/scores.csv", "w") as scores:
+            scores.truncate(0)
 
 counties = ['Annapolis', 'Antigonish', 'Cape Breton', 'Colchester', 'Cumberland', 
             'Digby', 'Guysborough','Halifax', 'Hants', 'Inverness', 'Kings', 'Lunenburg', 
             'Pictou', 'Queens', 'Richmond', 'Shelburne', 'Victoria', 'Yarmouth']
 modes = ['Phone', 'CW', 'Digital']
 
-QSOCount = 0
-countiesWorked = []
-score = 0
+
 # A dictionary of calls and modes so we can check for duplicates.
 #callDict = {}
 callList = []
@@ -46,7 +61,7 @@ menu_def = [['&File', ['&Open     Ctrl-O', '&Save       Ctrl-S', '&Clear Scores'
             ['&Toolbar', ['---', 'Command &1', 'Command &2',
                         '---', 'Command &3', 'Command &4']],
             ['&Help', '&About...'], ]
-
+# ------------------------------#
 layout =[
         [sg.Menu(menu_def, tearoff=False, pad=(200, 1))],
         [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = False, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
@@ -56,9 +71,9 @@ layout =[
         [sg.Frame(layout = [[sg.Multiline(default_text='Hello list!!', background_color = 'white')]], title = 'Your Log', pad = ((20, 20),(0, 20)))]] 
           
 window = sg.Window('NSARA Contest Logger', layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
-
+ 
 while True:
-    event, values = window.read()                                                                                               
+    event, values = window.read()                                                                                              
   
     if event == 'Exit' or event == sg.WIN_CLOSED:
         # Write the scores to a local file for next session      
@@ -80,10 +95,7 @@ while True:
     if event == 'Open':
             filename = sg.popup_get_file('file to open', no_window=True)
             print('Open clicked')
-
-    if event == 'Clear Scores':
-            clearScores()
-
+    
     if event == 'Save':
         if values['-Call-'] != '' and values['-County-'] != '': 
             
@@ -100,12 +112,14 @@ while True:
                 log.write(values['-County-'] + '\n')          
             #****************
             # Display a runing total of QSO's, new counties worked and total score
-            QSOCount+=1
+            QSOCount+=1            
             window.Element('-QSO-').update(QSOCount)
             if not values['-County-'] in countiesWorked and values['-County-'] in counties:
-                countiesWorked.append(values['-County-'])                
-            window.Element('-Counties-').update(len(countiesWorked))
-            score = QSOCount * len(countiesWorked)
+                countiesWorked.append(values['-County-']) 
+                countyScore = len(countiesWorked) 
+                #print('Line 114: ' + str(countyScore))              
+            window.Element('-Counties-').update(countyScore)
+            score = QSOCount * countyScore
             window.Element('-Score-').update(score)
             #***************
             window.Element('-Time-').update(current_time)            
@@ -121,5 +135,8 @@ while True:
             sg.popup('Callsign cannot be blank.') 
         else: # values['-County-']== '':
             sg.popup('County or Serial cannot be blank.') 
-        #***************            
+        #***************   
+    if event == 'Clear Scores':
+        print('Line 125')
+        clearScores()         
 window.close()
