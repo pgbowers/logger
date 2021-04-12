@@ -6,7 +6,7 @@ March 25, 2021
 * [x] RST should default to 59 but be changeable
 * [x] Do dropdown for Mode: Phone, CW, Digital
 * [x] Do dropdown for County listing all NS counties but allow other input as well
-* [x] Check for dupes unless mode is different
+* [ ] Check for dupes unless mode is different
 * [x] Show stats: # of QSO's + # of counties = score
 * [ ] Put fields into columns
 * [x] Put a frame around the input section
@@ -17,3 +17,4 @@ March 25, 2021
 * [x] Need code to clear the scores and scores file after the contest is over - Done Apr 9
 * [ ] Save and restore scores between sessions
 * [ ] Add fields to capture the date and callsign
+* [ ] Put try/except around the file loads
