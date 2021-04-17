@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import pickle
+import csv
 from datetime import datetime
 
 sg.theme('Kayak')
@@ -9,14 +10,15 @@ countiesWorked = []
 QSOCount = 0
 score = 0
 countyScore = 0
+#data = []
 
 # Get the current system time for the log
 now = datetime.now()
 current_time = now.strftime("%H:%M")
 
 # load our previously saved data
-with open('callFile', 'rb') as f:
-    myCall = pickle.load(f)
+#with open('call.txt', 'rb') as f:
+#    myCall = pickle.load(f)
 
 def clearInput():
         # A list of the inputs we want to clear
@@ -31,7 +33,6 @@ def clearInput():
 
 def clearScores():
     # clear the scoring fields and the scores.csv file
-
     # send a popup first to make sure...
     confirmClear = sg.popup_yes_no('Are you sure?', title = 'Confirm clear scores')    
     if confirmClear == 'No':
@@ -49,11 +50,25 @@ def clearScores():
         # erase the contents of the scores file
         with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/scores.csv", "w") as scores:
             scores.truncate(0)
+#***********************************
+# get the log to display in the table
+def displayContacts():
+    with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'r') as infile:
+        reader = csv.reader(infile)
+        try:
+            data = list(reader) # read the file into a list of rows
+            #print(data)
+        except:
+            sg.popup_error('Error reading file')
+        return data
+#************************************
+
 
 counties = ['Annapolis', 'Antigonish', 'Cape Breton', 'Colchester', 'Cumberland', 
             'Digby', 'Guysborough','Halifax', 'Hants', 'Inverness', 'Kings', 'Lunenburg', 
             'Pictou', 'Queens', 'Richmond', 'Shelburne', 'Victoria', 'Yarmouth']
 modes = ['Phone', 'CW', 'Digital']
+headings = ['Call', 'Time', 'RST', 'Mode', 'County or Serial#']
 
 # A dictionary of calls and modes so we can check for duplicates.
 #callDict = {}
@@ -65,20 +80,37 @@ menu_def = [['&File', ['&Setup', ['Your Callsign', 'Contest Date', ], '&Clear Sc
             ['&Help', '&About...'] 
            ]
 # ------------------------------#
+#displayContacts()
+
+#print('Line 82:', data)
 
 layout =[
         [sg.Menu(menu_def, tearoff=False, pad=(200, 1))],
         [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = False, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
         [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
-        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20)))],
-        [sg.Frame(layout = [[sg.Multiline(default_text='', k = '-LogDisplay-', autoscroll = True, disabled = True, do_not_clear = True, size = (200, 4), background_color = 'white')]], title = 'Your Log', pad = ((20, 20),(0, 20)))]
+        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20)))],       
+        [sg.Table(values='', headings=headings, max_col_width=25,
+            # background_color='light blue',
+            auto_size_columns=False,
+            display_row_numbers=True,
+            justification='center',
+            def_col_width = 15,
+            num_rows=10,
+            alternating_row_color='lightyellow',
+            key='-Table-',
+            row_height=35,
+            tooltip='This is a table')],
+          [sg.Button('Change Colors')],          
+          [sg.Text('Change Colors = Changes the colors of rows 8 and 9')],
         ] 
         
-window = sg.Window('NSARA Contest Logger for: ' + str(myCall), layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
+window = sg.Window('NSARA Contest Logger for: ' + str('ve1bzi'), layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
  
 while True:
-    event, values = window.read()                                                                                              
+    event, values = window.read()  
+
+    #displayContacts()                                                                                            
   
     if event == 'Exit' or event == sg.WIN_CLOSED:
         # Write the scores to a local file for next session      
@@ -103,7 +135,7 @@ while True:
 
     if event == 'Your Callsign':
         callSign = sg.PopupGetText('Enter your Callsign or SWL for shortwave listener', title = 'Your Callsign')
-        with open('callFile', 'wb') as f:
+        with open('call.txt', 'wb') as f:
             pickle.dump(callSign, f)
         print(callSign)
 
@@ -111,7 +143,8 @@ while True:
         clearScores()   
     #**************
     # when the save button is pressed
-    if event == 'Save':
+    if event == 'Save':       
+
         # make sure that the call and county fields have a value in them
         if values['-Call-'] != '' and values['-County-'] != '': 
             #******************
@@ -127,14 +160,20 @@ while True:
                 logentry.append(values['-RST-'])
                 logentry.append(values['-Mode-'])
                 logentry.append(values['-County-'])
-                print('Line 135: ' + str(logentry))
+                print('Line 135: ', logentry)
 
                 #[print(*word) for word in logentry]
-                #for word in logentry:
-                #    window['-LogDisplay-'].update(value = word, append = False, autoscroll = True)
+                #for i in logentry:
+                    #word = *i
+                data.append([list(logentry)])
+
+                window['-Table-'].Update(values=data)
+                    
+                #print('Line 136: ' + str(logentry))
 
                 for word in logentry:
                    print (word, end = ' ')
+                print('\n')
 
             #*****************    
             # Write the logentry to a local file        
