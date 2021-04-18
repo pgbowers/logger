@@ -10,7 +10,7 @@ countiesWorked = []
 QSOCount = 0
 score = 0
 countyScore = 0
-#data = []
+data = []
 
 # Get the current system time for the log
 now = datetime.now()
@@ -57,7 +57,7 @@ def displayContacts():
         reader = csv.reader(infile)
         try:
             data = list(reader) # read the file into a list of rows
-            #print(data)
+            print('Line 60: ', data)
         except:
             sg.popup_error('Error reading file')
         return data
@@ -90,7 +90,7 @@ layout =[
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
         [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
         [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20)))],       
-        [sg.Table(values='', headings=headings, max_col_width=25,
+        [sg.Table(values=displayContacts(), headings=headings, max_col_width=25,
             # background_color='light blue',
             auto_size_columns=False,
             display_row_numbers=True,
@@ -165,33 +165,23 @@ while True:
                 #[print(*word) for word in logentry]
                 #for i in logentry:
                     #word = *i
-                data.append([list(logentry)])
+                #data.append([list(logentry)])
+                #print('Line 169: ', data)
+                #***************************************
+                # add each log entry to the .csv file (Apr 18)
+                with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'a') as infile:
+                    writer = csv.writer(infile)
+                    writer.writerow(logentry)
+                #***************************************
 
-                window['-Table-'].Update(values=data)
+                # This will display the refreshed table after each entry
+                window['-Table-'].Update(values=displayContacts())
+
+                # This will write  only the last entry to the table
+                #window['-Table-'].Update(values=[list(logentry)])
                     
                 #print('Line 136: ' + str(logentry))
-
-                for word in logentry:
-                   print (word, end = ' ')
-                print('\n')
-
-            #*****************    
-            # Write the logentry to a local file        
-            with open('mylog.txt', 'ab') as log:            
-                pickle.dump(logentry , log)
-            #*****************
-
-            with open('mylog.txt', 'rb') as log:
-                readout = []
-                while True:
-                    try:
-                        readout.append(pickle.load(log))
-                        #window['-LogDisplay-'].update(value = readout, append = False, autoscroll = True)
-                        #print(readout)
-                    except EOFError: # reached the end of the file
-                        break                               
-                #print(readout)               
-                                       
+                                                  
             #****************
             # Display a runing total of QSO's, new counties worked and total score
             QSOCount+=1            
