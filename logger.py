@@ -53,14 +53,21 @@ def clearScores():
 #***********************************
 # get the log to display in the table
 def displayContacts():
-    with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'r') as infile:
-        reader = csv.reader(infile)
-        try:
-            data = list(reader) # read the file into a list of rows
-            print('Line 60: ', data)
-        except:
-            sg.popup_error('Error reading file')
-        return data
+    try:
+        with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'r') as logfile:
+            reader = csv.reader(logfile)
+            try:
+                data = list(reader) # read the file into a list of rows
+                #print('Line 60: ', data)
+            except IOError:
+                sg.popup_error('Error reading file')
+            return data
+    except IOError:
+        #print('No such file!!')
+        fileCreate = sg.popup_ok('File not found, click OK to create')
+        if fileCreate == 'Yes':
+            with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'w'):
+                pass
 #************************************
 
 
@@ -86,11 +93,11 @@ menu_def = [['&File', ['&Setup', ['Your Callsign', 'Contest Date', ], '&Clear Sc
 
 layout =[
         [sg.Menu(menu_def, tearoff=False, pad=(200, 1))],
-        [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = False, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
+        [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = True, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
-        [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
+        [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), bind_return_key = True, pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
         [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20)))],       
-        [sg.Table(values=displayContacts(), headings=headings, max_col_width=25,
+        [sg.Table(values='', headings=headings, max_col_width=25,
             # background_color='light blue',
             auto_size_columns=False,
             display_row_numbers=True,
@@ -160,7 +167,7 @@ while True:
                 logentry.append(values['-RST-'])
                 logentry.append(values['-Mode-'])
                 logentry.append(values['-County-'])
-                print('Line 135: ', logentry)
+                #print('Line 135: ', logentry)
 
                 #[print(*word) for word in logentry]
                 #for i in logentry:
@@ -169,8 +176,8 @@ while True:
                 #print('Line 169: ', data)
                 #***************************************
                 # add each log entry to the .csv file (Apr 18)
-                with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'a') as infile:
-                    writer = csv.writer(infile)
+                with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'a') as logfile:
+                    writer = csv.writer(logfile)
                     writer.writerow(logentry)
                 #***************************************
 
