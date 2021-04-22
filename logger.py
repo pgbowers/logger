@@ -1,7 +1,8 @@
 import PySimpleGUI as sg
 import pickle
 import csv
-from datetime import datetime
+import datetime
+#import time
 
 sg.theme('Kayak')
 
@@ -11,14 +12,15 @@ QSOCount = 0
 score = 0
 countyScore = 0
 data = []
+contest_date = ''
 
 # Get the current system time for the log
-now = datetime.now()
+now = datetime.datetime.now()
 current_time = now.strftime("%H:%M")
 
 # load our previously saved data
-#with open('call.txt', 'rb') as f:
-#    myCall = pickle.load(f)
+with open('call.txt', 'rb') as f:
+    myCall = pickle.load(f)
 
 def clearInput():
         # A list of the inputs we want to clear
@@ -77,8 +79,7 @@ counties = ['Annapolis', 'Antigonish', 'Cape Breton', 'Colchester', 'Cumberland'
 modes = ['Phone', 'CW', 'Digital']
 headings = ['Call', 'Time', 'RST', 'Mode', 'County or Serial#']
 
-# A dictionary of calls and modes so we can check for duplicates.
-#callDict = {}
+# A list of calls and modes so we can check for duplicates.
 callList = []
 
 # ------ Menu Definition ------ #
@@ -87,9 +88,6 @@ menu_def = [['&File', ['&Setup', ['Your Callsign', 'Contest Date', ], '&Clear Sc
             ['&Help', '&About...'] 
            ]
 # ------------------------------#
-#displayContacts()
-
-#print('Line 82:', data)
 
 layout =[
         [sg.Menu(menu_def, tearoff=False, pad=(200, 1))],
@@ -112,12 +110,10 @@ layout =[
           [sg.Text('Change Colors = Changes the colors of rows 8 and 9')],
         ] 
         
-window = sg.Window('NSARA Contest Logger for: ' + str('ve1bzi'), layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
+window = sg.Window('NSARA Contest Logger for: ' + str(myCall), layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
  
 while True:
-    event, values = window.read()  
-
-    #displayContacts()                                                                                            
+    event, values = window.read()                                                                                            
   
     if event == 'Exit' or event == sg.WIN_CLOSED:
         # Write the scores to a local file for next session      
@@ -141,10 +137,17 @@ while True:
         print('Open clicked')
 
     if event == 'Your Callsign':
-        callSign = sg.PopupGetText('Enter your Callsign or SWL for shortwave listener', title = 'Your Callsign')
+        callSign = sg.popup_get_text('Enter your Callsign or SWL for shortwave listener', title = 'Your Callsign')
         with open('call.txt', 'wb') as f:
             pickle.dump(callSign, f)
         print(callSign)
+
+    if event == 'Contest Date':
+        get_contest_date = sg.popup_get_date(title = 'Choose the Contest Date', no_titlebar = False)        
+        contest_date = datetime.datetime.strptime(str(get_contest_date),'(%m, %d, %Y)').strftime('%B %d, %Y')
+        with open('date.txt', 'wb') as f:
+            pickle.dump(contest_date, f)
+        print (contest_date)       
 
     if event == 'Clear Scores':        
         clearScores()   
