@@ -19,8 +19,10 @@ now = datetime.datetime.now()
 current_time = now.strftime("%H:%M")
 
 # load our previously saved data
-with open('call.txt', 'rb') as f:
-    myCall = pickle.load(f)
+with open('call.csv', 'r') as call_file:
+    myCall = list(csv.reader(call_file))
+    for row in myCall:
+        print(myCall)
 
 def clearInput():
         # A list of the inputs we want to clear
@@ -56,7 +58,8 @@ def clearScores():
 # get the log to display in the table
 def displayContacts():
     try:
-        with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'r') as logfile:
+        #with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog4.csv", 'r') as logfile:
+        with open("mylog5.csv", 'r') as logfile:
             reader = csv.reader(logfile)
             try:
                 data = list(reader) # read the file into a list of rows
@@ -67,8 +70,8 @@ def displayContacts():
     except IOError:
         #print('No such file!!')
         fileCreate = sg.popup_ok('File not found, click OK to create')
-        if fileCreate == 'Yes':
-            with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'w'):
+        if fileCreate == 'OK':
+            with open("mylog5.csv", 'w'):
                 pass
 #************************************
 
@@ -137,24 +140,25 @@ while True:
         print('Open clicked')
 
     if event == 'Your Callsign':
-        callSign = sg.popup_get_text('Enter your Callsign or SWL for shortwave listener', title = 'Your Callsign')
-        with open('call.txt', 'wb') as f:
-            pickle.dump(callSign, f)
-        print(callSign)
+        call_sign = sg.popup_get_text('Enter your Callsign or SWL for shortwave listener', title = 'Your Callsign')
+        with open('call.csv', 'w') as call:
+            call_writer = csv.writer(call)
+            call_writer.writerow([call_sign])
+        #print(call_sign)
 
     if event == 'Contest Date':
         get_contest_date = sg.popup_get_date(title = 'Choose the Contest Date', no_titlebar = False)        
         contest_date = datetime.datetime.strptime(str(get_contest_date),'(%m, %d, %Y)').strftime('%B %d, %Y')
-        with open('date.txt', 'wb') as f:
-            pickle.dump(contest_date, f)
-        print (contest_date)       
+        with open('date.csv', 'w') as date:
+            date_writer = csv.writer(date)
+            date_writer.writerow([contest_date])
+        #print (contest_date)       
 
     if event == 'Clear Scores':        
         clearScores()   
     #**************
     # when the save button is pressed
-    if event == 'Save':       
-
+    if event == 'Save':     
         # make sure that the call and county fields have a value in them
         if values['-Call-'] != '' and values['-County-'] != '': 
             #******************
@@ -179,9 +183,9 @@ while True:
                 #print('Line 169: ', data)
                 #***************************************
                 # add each log entry to the .csv file (Apr 18)
-                with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog1.csv", 'a') as logfile:
-                    writer = csv.writer(logfile)
-                    writer.writerow(logentry)
+                with open('log.csv', 'a') as logfile:
+                   logwriter = csv.writer(logfile)
+                   logwriter.writerow(logentry)
                 #***************************************
 
                 # This will display the refreshed table after each entry

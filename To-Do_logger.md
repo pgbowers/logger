@@ -19,4 +19,8 @@ March 25, 2021
 * [ ] Add fields to capture the date and callsign
 * [ ] Put try/except around the file loads
 * [ ] Do a check for our .csv files at startup. Assign to variables if ok, create if not.
-* [ ] County/Serial filed should allow only numbers 0 to 9 or value from drop-down
+* [ ] County/Serial field should allow only numbers 0 to 9 or value from drop-down
+* [ ] Choose logfile from a popup or create new file from popup if possible.
+* [ ] Add text fields for Call and Date in the Scores row
+* [ ] Remove Call from header
+* [ ] Fix call loading at line 22.....
