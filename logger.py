@@ -2,7 +2,6 @@ import PySimpleGUI as sg
 import pickle
 import csv
 import datetime
-#import time
 
 sg.theme('Kayak')
 
@@ -13,16 +12,20 @@ score = 0
 countyScore = 0
 data = []
 contest_date = ''
+callSign = []
+# A list of calls and modes so we can check for duplicates.
+callList = []
 
 # Get the current system time for the log
 now = datetime.datetime.now()
 current_time = now.strftime("%H:%M")
 
-# load our previously saved data
+# load our previously saved call sign data.
 with open('call.csv', 'r') as call_file:
-    myCall = list(csv.reader(call_file))
+    myCall = csv.reader(call_file)
+    # Convert the .csv to a single string and make it uppercase.   
     for row in myCall:
-        print(myCall)
+        callSign = f'{row[0].upper()}'       
 
 def clearInput():
         # A list of the inputs we want to clear
@@ -59,7 +62,7 @@ def clearScores():
 def displayContacts():
     try:
         #with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog4.csv", 'r') as logfile:
-        with open("mylog5.csv", 'r') as logfile:
+        with open("log.csv", 'r') as logfile:
             reader = csv.reader(logfile)
             try:
                 data = list(reader) # read the file into a list of rows
@@ -67,23 +70,18 @@ def displayContacts():
             except IOError:
                 sg.popup_error('Error reading file')
             return data
-    except IOError:
-        #print('No such file!!')
+    except IOError:        
         fileCreate = sg.popup_ok('File not found, click OK to create')
         if fileCreate == 'OK':
             with open("mylog5.csv", 'w'):
                 pass
 #************************************
 
-
 counties = ['Annapolis', 'Antigonish', 'Cape Breton', 'Colchester', 'Cumberland', 
             'Digby', 'Guysborough','Halifax', 'Hants', 'Inverness', 'Kings', 'Lunenburg', 
             'Pictou', 'Queens', 'Richmond', 'Shelburne', 'Victoria', 'Yarmouth']
 modes = ['Phone', 'CW', 'Digital']
 headings = ['Call', 'Time', 'RST', 'Mode', 'County or Serial#']
-
-# A list of calls and modes so we can check for duplicates.
-callList = []
 
 # ------ Menu Definition ------ #
 menu_def = [['&File', ['&Setup', ['Your Callsign', 'Contest Date', ], '&Clear Scores', 'E&xit']],
@@ -97,9 +95,8 @@ layout =[
         [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = True, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
         [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), bind_return_key = True, pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
-        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20)))],       
-        [sg.Table(values='', headings=headings, max_col_width=25,
-            # background_color='light blue',
+        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign)],    
+        [sg.Table(values=displayContacts(), headings=headings, max_col_width=25,            
             auto_size_columns=False,
             display_row_numbers=True,
             justification='center',
@@ -108,12 +105,12 @@ layout =[
             alternating_row_color='lightyellow',
             key='-Table-',
             row_height=35,
-            tooltip='This is a table')],
+            tooltip='Displays your current log.')],
           [sg.Button('Change Colors')],          
           [sg.Text('Change Colors = Changes the colors of rows 8 and 9')],
         ] 
         
-window = sg.Window('NSARA Contest Logger for: ' + str(myCall), layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
+window = sg.Window('NSARA Contest Logger for: ' + callSign, layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
  
 while True:
     event, values = window.read()                                                                                            
@@ -152,7 +149,7 @@ while True:
         with open('date.csv', 'w') as date:
             date_writer = csv.writer(date)
             date_writer.writerow([contest_date])
-        #print (contest_date)       
+        print (contest_date)       
 
     if event == 'Clear Scores':        
         clearScores()   
@@ -191,13 +188,11 @@ while True:
                 # This will display the refreshed table after each entry
                 window['-Table-'].Update(values=displayContacts())
 
-                # This will write  only the last entry to the table
-                #window['-Table-'].Update(values=[list(logentry)])
-                    
-                #print('Line 136: ' + str(logentry))
+                # This will write  only the last entry to the table.
+                #window['-Table-'].Update(values=[list(logentry)])                
                                                   
             #****************
-            # Display a runing total of QSO's, new counties worked and total score
+            # Display a runing total of QSO's, new counties worked and total score.
             QSOCount+=1            
             window.Element('-QSO-').update(QSOCount)
             if not values['-County-'] in countiesWorked and values['-County-'] in counties:
