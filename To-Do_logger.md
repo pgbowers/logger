@@ -16,11 +16,11 @@ March 25, 2021
 * [ ] Make a Clean Sweep popup for all 18 counties
 * [x] Need code to clear the scores and scores file after the contest is over - Done Apr 9
 * [ ] Save and restore scores between sessions
-* [ ] Add fields to capture the date and callsign
-* [ ] Put try/except around the file loads
-* [ ] Do a check for our .csv files at startup. Assign to variables if ok, create if not.
+* [x] Add fields to capture the date and callsign
+* [x] Put try/except around the file loads
+* [x] Do a check for our .csv files at startup. Assign to variables if ok, create if not.
 * [ ] County/Serial field should allow only numbers 0 to 9 or value from drop-down
 * [ ] Choose logfile from a popup or create new file from popup if possible.
-* [ ] Add text fields for Call and Date in the Scores row
-* [ ] Remove Call from header
-* [ ] Fix call loading at line 22.....
+* [x] Add text fields for Call and Date in the Scores row
+* [x] Remove Call from header
+* [x] Fix call loading at line 22.....

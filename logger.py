@@ -20,12 +20,36 @@ callList = []
 now = datetime.datetime.now()
 current_time = now.strftime("%H:%M")
 
+# -----------------------------------------
 # load our previously saved call sign data.
-with open('call.csv', 'r') as call_file:
-    myCall = csv.reader(call_file)
-    # Convert the .csv to a single string and make it uppercase.   
-    for row in myCall:
-        callSign = f'{row[0].upper()}'       
+try:
+    with open('call.csv', 'r') as call_file:
+        myCall = csv.reader(call_file)
+        # Convert the .csv to a single string and make it uppercase.   
+        for row in myCall:
+            callSign = f'{row[0].upper()}'
+except IOError:          
+    fileCreate = sg.popup_ok('Callsign File not found, click OK to create')
+    if fileCreate == 'OK':
+        with open('call.csv', 'w'):
+            pass
+# ----------------------------------------
+
+# ----------------------------------------
+# load our previously saved contest date.
+try:
+    with open('date.csv', 'r') as date_file:
+        myDate = csv.reader(date_file)
+        # Convert the .csv to a single string and make it uppercase.   
+        for row in myDate:
+            contest_date = f'{row[0].upper()}'
+except IOError:
+    fileCreate = sg.popup_ok('Date File not found, click OK to create')
+    if fileCreate == 'OK':
+        with open('date.csv', 'w'):
+            pass
+# -----------------------------------------
+
 
 def clearInput():
         # A list of the inputs we want to clear
@@ -95,7 +119,7 @@ layout =[
         [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = True, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
         [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), bind_return_key = True, pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
-        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign)],    
+        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign, size = (10, 1),k = '-Callsign-'), sg.T(contest_date, size = (20, 1), k = '-Contest_Date-')],    
         [sg.Table(values=displayContacts(), headings=headings, max_col_width=25,            
             auto_size_columns=False,
             display_row_numbers=True,
@@ -110,7 +134,7 @@ layout =[
           [sg.Text('Change Colors = Changes the colors of rows 8 and 9')],
         ] 
         
-window = sg.Window('NSARA Contest Logger for: ' + callSign, layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
+window = sg.Window('NSARA Contest Logger', layout, font = 'Arial', element_justification = 'l', grab_anywhere = True, resizable = True) 
  
 while True:
     event, values = window.read()                                                                                            
@@ -140,16 +164,18 @@ while True:
         call_sign = sg.popup_get_text('Enter your Callsign or SWL for shortwave listener', title = 'Your Callsign')
         with open('call.csv', 'w') as call:
             call_writer = csv.writer(call)
-            call_writer.writerow([call_sign])
-        #print(call_sign)
+            call_writer.writerow([call_sign])       
+        # This will display the callsign as soon as OK is clicked in the popup.
+        window['-Callsign-'].Update(call_sign.upper())
 
     if event == 'Contest Date':
         get_contest_date = sg.popup_get_date(title = 'Choose the Contest Date', no_titlebar = False)        
         contest_date = datetime.datetime.strptime(str(get_contest_date),'(%m, %d, %Y)').strftime('%B %d, %Y')
         with open('date.csv', 'w') as date:
             date_writer = csv.writer(date)
-            date_writer.writerow([contest_date])
-        print (contest_date)       
+            date_writer.writerow([contest_date])        
+        # This will display the callsign as soon as OK is clicked in the popup.
+        window['-Contest_Date-'].Update(contest_date.upper())      
 
     if event == 'Clear Scores':        
         clearScores()   
