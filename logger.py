@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
-import pickle
+#import pickle
 import csv
+import pandas as pd
 import datetime
 
 sg.theme('Kayak')
@@ -49,8 +50,6 @@ except IOError:
         with open('date.csv', 'w'):
             pass
 # -----------------------------------------
-
-
 def clearInput():
         # A list of the inputs we want to clear
        keys_to_clear = ['-Call-', '-RST-', '-County-']
@@ -82,15 +81,13 @@ def clearScores():
         with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/scores.csv", "w") as scores:
             scores.truncate(0)
 #***********************************
-# get the log to display in the table
+# get the stored log to display in the table
 def displayContacts():
-    try:
-        #with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/mylog4.csv", 'r') as logfile:
+    try:        
         with open("log.csv", 'r') as logfile:
             reader = csv.reader(logfile)
             try:
-                data = list(reader) # read the file into a list of rows
-                #print('Line 60: ', data)
+                data = list(reader) # read the file into a list of rows                
             except IOError:
                 sg.popup_error('Error reading file')
             return data
@@ -116,9 +113,9 @@ menu_def = [['&File', ['&Setup', ['Your Callsign', 'Contest Date', ], '&Clear Sc
 
 layout =[
         [sg.Menu(menu_def, tearoff=False, pad=(200, 1))],
-        [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), focus = True, k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
+        [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
-        [sg.B('Save', tooltip = 'Save this QSO to the log', size = (15,1), bind_return_key = True, pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
+        [sg.B('Save', tooltip = 'Save this QSO to the log', focus = True, size = (15,1), bind_return_key = True, pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
         [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign, size = (10, 1),k = '-Callsign-'), sg.T(contest_date, size = (20, 1), k = '-Contest_Date-')],    
         [sg.Table(values=displayContacts(), headings=headings, max_col_width=25,            
             auto_size_columns=False,
@@ -197,13 +194,7 @@ while True:
                 logentry.append(values['-RST-'])
                 logentry.append(values['-Mode-'])
                 logentry.append(values['-County-'])
-                #print('Line 135: ', logentry)
 
-                #[print(*word) for word in logentry]
-                #for i in logentry:
-                    #word = *i
-                #data.append([list(logentry)])
-                #print('Line 169: ', data)
                 #***************************************
                 # add each log entry to the .csv file (Apr 18)
                 with open('log.csv', 'a') as logfile:
@@ -212,10 +203,7 @@ while True:
                 #***************************************
 
                 # This will display the refreshed table after each entry
-                window['-Table-'].Update(values=displayContacts())
-
-                # This will write  only the last entry to the table.
-                #window['-Table-'].Update(values=[list(logentry)])                
+                window['-Table-'].Update(values=displayContacts())                               
                                                   
             #****************
             # Display a runing total of QSO's, new counties worked and total score.
@@ -246,6 +234,5 @@ while True:
             sg.popup('Callsign cannot be blank.') 
         else: # values['-County-']== '':
             sg.popup('County or Serial cannot be blank.') 
-        #***************   
-          
+        #***************             
 window.close()
