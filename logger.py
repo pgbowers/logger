@@ -9,6 +9,7 @@ sg.theme('Kayak')
 # Declare some variables
 countiesWorked = []
 QSOCount = 0
+#print('Line 12: ', type(QSOCount))
 score = 0
 countyScore = 0
 data = []
@@ -43,6 +44,25 @@ try:
         # Convert the .csv to a single string and make it uppercase.   
         for row in myDate:
             contest_date = f'{row[0].upper()}'
+except IOError:
+    fileCreate = sg.popup_ok('Date File not found, click OK to create')
+    if fileCreate == 'OK':
+        with open('date.csv', 'w'):
+            pass
+# -----------------------------------------
+
+# ----------------------------------------
+# load our previously saved score data.
+try:
+    with open('scores.csv', 'r') as score_file:
+        myScores = csv.reader(score_file)
+        # Convert the .csv to a single string and make it uppercase.   
+        for row in myScores:
+            QSOCount = int(row[0])
+            #print('Line 61: ', type(QSOCount))
+            countyScore = int(row[1])
+            #print(county_info)
+            score = int(row[2])
 except IOError:
     fileCreate = sg.popup_ok('Date File not found, click OK to create')
     if fileCreate == 'OK':
@@ -114,7 +134,7 @@ layout =[
         [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
         [sg.B('Save', tooltip = 'Save this QSO to the log', focus = True, size = (15,1), bind_return_key = True, pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
-        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T('', size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T('', size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T('', size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign, size = (10, 1),k = '-Callsign-'), sg.T(contest_date, size = (20, 1), k = '-Contest_Date-')],    
+        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T(QSOCount, size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T(countyScore, size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T(score, size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign, size = (10, 1),k = '-Callsign-'), sg.T(contest_date, size = (20, 1), k = '-Contest_Date-')],    
         [sg.Table(values = displayContacts(), headings=headings, max_col_width=25,            
             auto_size_columns=False,
             display_row_numbers=True,
