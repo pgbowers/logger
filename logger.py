@@ -97,7 +97,7 @@ def clearScores():
         window.Element('-Counties-').update(countyScore)
         window.Element('-Score-').update(score)    
         # erase the contents of the scores file
-        with open("/home/user1/apps/python/PySimpleGUI/Projects/logger/scores.csv", "w") as scores:
+        with open('scores.csv', 'w') as scores:
             scores.truncate(0)
 #***********************************
 # get the stored log to display in the table
@@ -232,7 +232,8 @@ while True:
             window.Element('-QSO-').update(QSOCount)
             if not values['-County-'] in countiesWorked and values['-County-'] in counties:
                 countiesWorked.append(values['-County-']) 
-                countyScore = len(countiesWorked) 
+                #countyScore = len(countiesWorked)
+                countyScore += 1 
                 #print('Line 114: ' + str(countyScore))              
             window.Element('-Counties-').update(countyScore)
             # if the first log entry is a serial number not a county(avoid multiply by zero error)

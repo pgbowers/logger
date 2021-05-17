@@ -24,4 +24,4 @@ March 25, 2021
 * [x] Add text fields for Call and Date in the Scores row
 * [x] Remove Call from header
 * [x] Fix call loading at line 22.....
-
+* [ ] May 17th, need to save the countiesWorked list between sessions as well as the countyScore
