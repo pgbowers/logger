@@ -60,19 +60,36 @@ try:
         for row in myScores:
             QSOCount = int(row[0])
             #print('Line 61: ', type(QSOCount))
-            countyScore = int(row[1])
+            #countyScore = int(row[1])
             #print(county_info)
-            score = int(row[2])
+            score = int(row[1])
 except IOError:
     fileCreate = sg.popup_ok('Date File not found, click OK to create')
     if fileCreate == 'OK':
         with open('date.csv', 'w'):
             pass
 # -----------------------------------------
+# ----------------------------------------
+#load the previously saved list of Counties worked.
+try:
+    with open('countiesWorked.csv', 'r') as file:
+        myCounty = csv.reader(file)
+        print('Line 77: ', list(myCounty))
+        for row in myCounty:
+            for i in range(len(row)):
+                countiesWorked.append(row[i])
+    
+except IOError:
+    fileCreate = sg.popup_ok('County File not found, click OK to create')
+    if fileCreate == 'OK':
+        with open('countiesWorked.csv', 'w'):
+            pass
+print('Line 80: ', countiesWorked)
+# -----------------------------------------
 def clearInput():
         # A list of the inputs we want to clear
        keys_to_clear = ['-Call-', '-RST-', '-County-']
-       # This section will clear the inputs and restore defaults
+       # This section will clear the inputs and restore defaults      
        for key in keys_to_clear:
         window[key]('')
         #window['-Time-']('')
@@ -134,7 +151,7 @@ layout =[
         [sg.Frame(layout = [[sg.T('Call:'), sg.I(size = (10, 1), k = '-Call-'), sg.T('Time:'), sg.I(default_text = current_time, size = (10, 1), k = '-Time-'), sg.T('RST:'),
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
         [sg.B('Save', tooltip = 'Save this QSO to the log', focus = True, size = (15,1), bind_return_key = True, pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
-        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T(QSOCount, size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T(countyScore, size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T(score, size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign, size = (10, 1),k = '-Callsign-'), sg.T(contest_date, size = (20, 1), k = '-Contest_Date-')],    
+        [sg.Frame(layout = [[sg.T("QSO's: "), sg.T(QSOCount, size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T(len(countiesWorked), size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T(score, size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign, size = (10, 1),k = '-Callsign-'), sg.T(contest_date, size = (20, 1), k = '-Contest_Date-')],    
         [sg.Table(values = displayContacts(), headings=headings, max_col_width=25,            
             auto_size_columns=False,
             display_row_numbers=True,
@@ -158,10 +175,16 @@ while True:
     event, values = window.read() 
                                                                                           
     if event == 'Exit' or event == sg.WIN_CLOSED:
+        # write the countiesWorked to a file
+        with open('countiesWorked.csv', 'w') as countyfile:
+            countywriter = csv.writer(countyfile)
+            countywriter.writerow(countiesWorked)
+        #***************************************        
+         
         # Write the scores to a local file for next session      
         with open('scores.csv', 'w') as scores:
             scores.write(str(QSOCount) + ',')
-            scores.write(str(len(countiesWorked)) + ',')
+            #scores.write(str(len(countiesWorked)) + ',')
             scores.write(str(score) + '\n')
             #scores.write('Test123')
         break
@@ -203,7 +226,7 @@ while True:
         # make sure that the call and county fields have a value in them
         if values['-Call-'] != '' and values['-County-'] != '': 
             #******************
-            # build a list of the counties that have been worked
+            # build a list of the calls that have been worked
             if not values['-Call-'] in callList:
                 callList.append(values['-Call-'])
                 #print('Line 118: ' + str(callList))
@@ -224,17 +247,20 @@ while True:
                 #***************************************              
 
                 # This will display the refreshed table after each entry
-                window['-Table-'].Update(values=displayContacts())              
-                                                                                              
+                window['-Table-'].Update(values=displayContacts()) 
+                                                                                                                            
             #****************
             # Display a runing total of QSO's, new counties worked and total score.
             QSOCount+=1            
             window.Element('-QSO-').update(QSOCount)
             if not values['-County-'] in countiesWorked and values['-County-'] in counties:
                 countiesWorked.append(values['-County-']) 
+                print ('Line 255: ', countiesWorked)
                 #countyScore = len(countiesWorked)
                 countyScore += 1 
-                #print('Line 114: ' + str(countyScore))              
+                #print('Line 114: ' + str(countyScore)) 
+                #***************************************
+                          
             window.Element('-Counties-').update(countyScore)
             # if the first log entry is a serial number not a county(avoid multiply by zero error)
             if countyScore == 0:
