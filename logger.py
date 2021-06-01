@@ -9,7 +9,6 @@ sg.theme('Kayak')
 # Declare some variables
 countiesWorked = []
 QSOCount = 0
-#print('Line 12: ', type(QSOCount))
 score = 0
 countyScore = 0
 data = []
@@ -72,19 +71,18 @@ except IOError:
 # ----------------------------------------
 #load the previously saved list of Counties worked.
 try:
-    with open('countiesWorked.csv', 'r') as file:
-        myCounty = csv.reader(file)
-        print('Line 77: ', list(myCounty))
-        for row in myCounty:
-            for i in range(len(row)):
-                countiesWorked.append(row[i])
-    
+    with open('counties.txt', 'r') as file1:
+        for line in file1:           
+            countiesWorked.append(line)
+        #countiesWorked = file1.readlines()
+        print('Line 77: ', countiesWorked)        
+        
 except IOError:
     fileCreate = sg.popup_ok('County File not found, click OK to create')
     if fileCreate == 'OK':
-        with open('countiesWorked.csv', 'w'):
+        with open('counties.csv', 'w'):
             pass
-print('Line 80: ', countiesWorked)
+
 # -----------------------------------------
 def clearInput():
         # A list of the inputs we want to clear
@@ -105,11 +103,11 @@ def clearScores():
         pass
     else:        
         # the global keyword is needed to change QSOCount in this function and have the change apply everywhere.
-        global QSOCount, score, countiesWorked, countyScore
+        global QSOCount, score, countyScore        
         QSOCount = 0
         score = 0
         countyScore = 0
-        countiesWorked = []       
+        #countiesWorked = []       
         window.Element('-QSO-').update(QSOCount)
         window.Element('-Counties-').update(countyScore)
         window.Element('-Score-').update(score)    
@@ -122,7 +120,7 @@ def displayContacts():
     try:
         df = pd.read_csv('log.csv')  
         data = df.values.tolist() 
-        #print('Line 93: ', data) 
+        #print('Line 124: ', data) 
         return data           
     except IOError:        
         fileCreate = sg.popup_ok('File not found, click OK to create')
@@ -152,6 +150,7 @@ layout =[
         sg.I(size = (10, 1), default_text = '59', k = '-RST-'), sg.T('Mode:'), sg.Combo(values = (modes), default_value = 'Phone', size = (10, 1), k = '-Mode-'), sg.T('County or Serial:'), sg.Combo(values = counties, size = (15,1), k = '-County-')],
         [sg.B('Save', tooltip = 'Save this QSO to the log', focus = True, size = (15,1), bind_return_key = True, pad = ((80, 0),(20,20))), sg.B('Clear', tooltip = 'Clear all fields', size = (15,1), pad = (80, 0)), sg.B('Exit', tooltip = 'Exit the logger', size = (15, 1), pad = (80, 1))]],title = "Input", pad = ((20, 20),(20, 20)))],
         [sg.Frame(layout = [[sg.T("QSO's: "), sg.T(QSOCount, size = (5, 1), k = '-QSO-'), sg.T("Counties: "), sg.T(len(countiesWorked), size = (5, 1),k = '-Counties-'), sg.T("Score: "), sg.T(score, size = (5, 1),k = '-Score-')]], title = 'Score', pad = ((20, 20),(0, 20))), sg.T(callSign, size = (10, 1),k = '-Callsign-'), sg.T(contest_date, size = (20, 1), k = '-Contest_Date-')],    
+        #sg.T(len(countiesWorked),
         [sg.Table(values = displayContacts(), headings=headings, max_col_width=25,            
             auto_size_columns=False,
             display_row_numbers=True,
@@ -175,11 +174,11 @@ while True:
     event, values = window.read() 
                                                                                           
     if event == 'Exit' or event == sg.WIN_CLOSED:
-        # write the countiesWorked to a file
-        with open('countiesWorked.csv', 'w') as countyfile:
-            countywriter = csv.writer(countyfile)
-            countywriter.writerow(countiesWorked)
-        #***************************************        
+        # write the counties worked to a file
+        # with open('counties.txt', 'w') as countyfile:
+        #     countywriter = csv.writer(countyfile)
+        #     countywriter.writerow(countiesWorked)
+        # #***************************************        
          
         # Write the scores to a local file for next session      
         with open('scores.csv', 'w') as scores:
@@ -255,8 +254,13 @@ while True:
             window.Element('-QSO-').update(QSOCount)
             if not values['-County-'] in countiesWorked and values['-County-'] in counties:
                 countiesWorked.append(values['-County-']) 
+                # append each new county to counties.txt (Jun 1)
+                with open('counties.txt', 'a') as logfile:
+                   #logwriter = csv.writer(logfile)
+                   logfile.write((values['-County-']))
+                print('Line 257: ', (values['-County-']))
                 print ('Line 255: ', countiesWorked)
-                #countyScore = len(countiesWorked)
+                countyScore = len(countiesWorked)
                 countyScore += 1 
                 #print('Line 114: ' + str(countyScore)) 
                 #***************************************
