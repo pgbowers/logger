@@ -107,6 +107,13 @@ def clearScores():
         # erase the contents of the scores file
         with open('scores.csv', 'w') as scores:
             scores.truncate(0)
+        # erase the contents of the counties.txt file
+        with open('counties.txt', 'w') as counties:
+            counties.truncate(0)
+        # erase the contents of the log.csv file
+        with open('log.csv', 'w') as logfile:
+            logwriter = csv.writer(logfile)            
+            logwriter.writerow(['Call', 'Time', 'RST', 'Mode', 'County or Serial#'])
 #***********************************
 # get the stored log to display in the table
 def displayContacts():
@@ -127,7 +134,7 @@ counties = ['Annapolis', 'Antigonish', 'Cape Breton', 'Colchester', 'Cumberland'
             'Digby', 'Guysborough','Halifax', 'Hants', 'Inverness', 'Kings', 'Lunenburg', 
             'Pictou', 'Queens', 'Richmond', 'Shelburne', 'Victoria', 'Yarmouth']
 modes = ['Phone', 'CW', 'Digital']
-headings = ['Call', 'Time', 'RaST', 'Mode', 'County or Serial#']
+headings = ['Call', 'Time', 'RST', 'Mode', 'County or Serial#']
 
 # ------ Menu Definition ------ #
 menu_def = [['&File', ['&Setup', ['Your Callsign', 'Contest Date', ], '&Clear Scores', 'E&xit']],
@@ -151,9 +158,7 @@ layout =[
             alternating_row_color='lightyellow',
             key='-Table-',
             row_height=35,
-            tooltip='Displays your current log.')],
-          [sg.Button('Change Colors')],          
-          [sg.Text('Change Colors = Changes the colors of rows 8 and 9')],
+            tooltip='Displays your current log.')],         
         ] 
         
 window = sg.Window('NSARA Contest Logger', 
